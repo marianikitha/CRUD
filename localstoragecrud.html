@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script src="https://kit.fontawesome.com/16103cbb15.js" crossorigin="anonymous"></script>
+        
+        <link rel="stylesheet" href="assignment1.css">
+        
+        <script>
+
+            var usersArray = [];
+        function init(){
+            document.getElementById("tablerows").innerHTML="";
+            if(localStorage.usersRecord){
+                usersArray=JSON.parse(localStorage.usersRecord);
+                for(var i=0;i<usersArray.length;i++){
+                    prepareTableCell(i,usersArray[i].name,usersArray[i].phno,usersArray[i].gender,usersArray[i].dob,usersArray[i].mail,usersArray[i].pwd)
+                }
+            }
+        }
+
+        function onSubmit(){
+            var name= document.getElementById("name").value;
+            var phno= document.getElementById("phno").value; 
+            if(document.getElementById('male').checked) {   
+              var gender=document.getElementById("male").value;    
+            } 
+            else if(document.getElementById("female").checked) {
+              var gender=document.getElementById("female").value; 
+            } 
+            else{
+              var gender=document.getElementById("others").value;
+            }
+           
+            var dob= document.getElementById("dob").value; 
+            var mail= document.getElementById("mail").value; 
+            var pwd= document.getElementById("pwd").value; 
+
+            if (name == "" && phno == "" && dob == "" && mail == "" && pwd == "") {
+    
+                document.getElementById("error").innerHTML="Please fill all the fields";
+                document.getElementById("error").style.color = "red";
+                document.getElementById("name").style.borderColor="red";
+                document.getElementById("phno").style.borderColor="red";
+                document.getElementById("dob").style.borderColor="red";
+                document.getElementById("mail").style.borderColor="red";
+                document.getElementById("pwd").style.borderColor="red";
+                return false;
+              }
+
+            else{
+                document.getElementById("name").style.borderColor="lightgrey";
+                document.getElementById("phno").style.borderColor="lightgrey";
+                document.getElementById("dob").style.borderColor="lightgrey";
+                document.getElementById("mail").style.borderColor="lightgrey";
+                document.getElementById("pwd").style.borderColor="lightgrey";
+            }
+           document.getElementById("error").innerHTML="";
+           
+           var name_correct= /^[A-Za-z]+$/;
+
+           if(name.match(name_correct)){
+            document.getElementById("name").style.borderColor="lightgrey";
+            true;
+           }
+           else{
+               document.getElementById("message").innerHTML="Please enter alphabets only";
+               document.getElementById("message").style.color = "red";
+               document.getElementById("name").style.borderColor="red";
+               return false;
+           }
+
+
+           if (pwd.length < 8){
+            document.getElementById("passwordmsg").innerHTML="Password must contain atleast 8 characters";
+            document.getElementById("passwordmsg").style.color = "red";
+             return false;
+           }
+           else if (pwd.search(/[a-z]/) < 0) {
+
+                document.getElementById("passwordmsg").innerHTML="Password must contain atleast 1 lower case letter";
+                document.getElementById("passwordmsg").style.color = "red";
+                 return false; 
+            } 
+            
+            else if(pwd.search(/[A-Z]/) < 0)
+             {
+                document.getElementById("passwordmsg").innerHTML="Password must contain atleast 1 upper case letter";
+                document.getElementById("passwordmsg").style.color = "red";
+                 return false;
+              } 
+              else  if (pwd.search(/[0-9]/) < 0)
+               {
+                document.getElementById("passwordmsg").innerHTML="Password must contain atlest 1 number";
+                document.getElementById("passwordmsg").style.color = "red";
+                return false;
+               } 
+               else {
+                document.getElementById("passwordmsg").innerHTML="";
+                
+                 }
+    
+           document.getElementById("message").innerHTML="";
+
+            var userObj={name: name,phno: phno, gender: gender, dob: dob,mail: mail,pwd: pwd}
+            
+            if(selectIndex==-1){
+                usersArray.push(userObj);
+            }
+            else{
+                usersArray.splice(selectIndex,1,userObj);
+            }
+           
+
+            localStorage.usersRecord=JSON.stringify(usersArray);
+
+            init();
+            onClear();
+            
+        }
+
+
+        function prepareTableCell(index,name,phno,gender,dob,mail){
+            var table=document.getElementById("tablerows");
+            var row=table.insertRow();
+            var nameCell=row.insertCell(0);
+            var phnoCell=row.insertCell(1);
+            var genderCell=row.insertCell(2);
+            var dobCell=row.insertCell(3);
+            var mailCell=row.insertCell(4);
+            var actionCell=row.insertCell(5);
+
+            nameCell.innerHTML=name;
+            phnoCell.innerHTML=phno;
+            genderCell.innerHTML=gender;
+            dobCell.innerHTML=dob;
+            mailCell.innerHTML=mail;
+
+            actionCell.innerHTML='<i id="btnEdit" class="fa-solid fa-pen" onclick="onEdit('+index+')"></i></br> <i id="btnDelete" class="fa-solid fa-trash" onclick="deletedata('+index+')"></i>';
+        }
+
+        function onClear(){
+            selectIndex=-1;
+            document.getElementById("name").value="";
+            document.getElementById("phno").value="";
+            
+            if(document.getElementById('male').checked) {   
+              male.checked=false;    
+            } 
+            else if(document.getElementById("female").checked) {
+                female.checked=false;  
+            } 
+            else{
+                others.checked=false; 
+            }
+            document.getElementById("dob").value="";
+            document.getElementById("mail").value="";
+            document.getElementById("pwd").value="";
+        }
+
+        var selectIndex=-1;
+        function onEdit(index){
+            selectIndex=index;
+            var userObj=usersArray[index];
+            document.getElementById("name").value=userObj.name;
+            document.getElementById("phno").value=userObj.phno;
+            document.getElementById("gender").value=userObj.gender;
+            document.getElementById("dob").value=userObj.dob;
+            document.getElementById("mail").value=userObj.mail
+            document.getElementById("pwd").value=userObj.pwd;
+        }
+
+
+
+
+        function deletedata(index){
+            usersArray.splice(index,1);
+            localStorage.usersRecord=JSON.stringify(usersArray);
+            init();
+        }
+
+        </script>
+    </head>
+    <body onload="init()">
+      
+            <h2> User Form</h2>
+            <div class="form-group">
+            <label for="name">Name:</label><br>
+            <input type="text" class="form-control" id="name"><br>
+            <span id="message"></span>
+     </div>
+            <br>
+            <div class="form-group">
+            <label for="name">Phone Number:</label><br>
+            <input type="text" class="form-control"  id="phno" maxlength="10"><br>
+        </div>
+            
+            <p id="gender">Gender:</p>
+            <input type="radio"  id="male" name="gender" value="Male">
+            <label for="male">Male</label><br>
+            <input type="radio"  id="female" name="gender" value="Female">
+            <label for="female">Female</label><br>
+            <input type="radio"  id="others" name="gender" value="Other">
+            <label for="other">Other</label><br><br>
+        
+            
+            <div class="form-group">
+            <label for="dob">DOB:</label><br>
+            <input type="date" class="form-control" id="dob" ><br><br>
+      </div>
+      <div class="form-group">
+            <label for="mail">Email:</label><br>
+            <input type="email"class="form-control" id="mail"><br><br>
+      </div>
+      <div class="form-group">
+            <label for="pwd">Password:</label><br>
+            <input type="password" class="form-control" id="pwd"><br>
+            <span id="passwordmsg"></span>
+            <br> </div>
+            <div id="error"></div><br>
+           
+            <button id="submit" onclick="onSubmit()">Submit</button>
+            <button id="clear" onclick="onClear()">Clear</button>
+           
+            
+        
+        <br>
+
+        
+
+    <h2>User Records</h2>
+    <div class="container">
+        <div class="row">
+            <div class="table-responsive table-bordered movie-table">
+                <table class="table movie-table" >
+                    <thead>
+                        <tr class= "movie-table-head">
+                            <th>Name</th>
+                            <th>Phone Number</th>
+                            <th>Gender</th>
+                            <th>Date of birth</th>
+                            <th>Email</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>  
+                    <tbody id="tablerows">
+
+                    </tbody>
+                </table>
+            </div>
+	</div>
+</div> 
+
+    </body>
+</html>
